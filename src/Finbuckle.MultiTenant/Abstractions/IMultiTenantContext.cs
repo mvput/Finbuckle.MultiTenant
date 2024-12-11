@@ -6,12 +6,12 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Non-generic interface for the MultiTenantContext.
 /// </summary>
-public interface IMultiTenantContext
+public interface IMultiTenantContext<out TId> where TId : IEquatable<TId> , ISpanParsable<TId>
 {
     /// <summary>
     /// Information about the tenant for this context.
     /// </summary>
-    ITenantInfo? TenantInfo { get; }
+    ITenantInfo<TId>? TenantInfo { get; }
 
     /// <summary>
     /// True if a tenant has been resolved and TenantInfo is not null.
@@ -30,8 +30,8 @@ public interface IMultiTenantContext
 /// Generic interface for the multi-tenant context.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
-    where TTenantInfo : class, ITenantInfo, new()
+public interface IMultiTenantContext<TTenantInfo, TId> : IMultiTenantContext<TId>
+    where TTenantInfo : class, ITenantInfo<TId>, new() where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <summary>
     /// Information about the tenant for this context.
@@ -41,5 +41,5 @@ public interface IMultiTenantContext<TTenantInfo> : IMultiTenantContext
     /// <summary>
     /// Information about the MultiTenant stores for this context.
     /// </summary>
-    StoreInfo<TTenantInfo>? StoreInfo { get; set; }
+    StoreInfo<TTenantInfo, TId>? StoreInfo { get; set; }
 }

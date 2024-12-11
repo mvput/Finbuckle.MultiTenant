@@ -5,8 +5,8 @@ using Finbuckle.MultiTenant.Abstractions;
 
 namespace Finbuckle.MultiTenant;
 
-public class StoreInfo<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public class StoreInfo<TTenantInfo, TId> where TTenantInfo : class, ITenantInfo<TId>, new() where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     public Type? StoreType { get; internal set; }
-    public IMultiTenantStore<TTenantInfo>? Store { get; internal set; }
+    public IMultiTenantStore<TTenantInfo, TId>? Store { get; internal set; }
 }

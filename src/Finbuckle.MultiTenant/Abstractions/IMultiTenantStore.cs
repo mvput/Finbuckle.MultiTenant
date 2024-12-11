@@ -7,7 +7,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// Interface definition for tenant stores.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+public interface IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : class, ITenantInfo<TId>, new() where TId : IEquatable<TId> , ISpanParsable<TId>
 {
     /// <summary>
     /// Try to add the TTenantInfo to the store.
@@ -28,7 +28,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// </summary>
     /// <param name="identifier">Identifier for the tenant to remove.</param>
     /// <returns>True if successfully removed.</returns>
-    Task<bool> TryRemoveAsync(string identifier);
+    Task<bool> TryRemoveAsync(TId identifier);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given identifier.
@@ -36,7 +36,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// <param name="identifier">Identifier for the tenant to retrieve.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
     ///  TODO make obsolete
-    Task<TTenantInfo?> TryGetByIdentifierAsync(string identifier);
+    Task<TTenantInfo?> TryGetByIdentifierAsync(TId identifier);
 
     /// <summary>
     /// Retrieve the TTenantInfo for a given tenant Id.
@@ -44,7 +44,7 @@ public interface IMultiTenantStore<TTenantInfo> where TTenantInfo : class, ITena
     /// <param name="id">TenantId for the tenant to retrieve.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
     ///  TODO make obsolete
-    Task<TTenantInfo?> TryGetAsync(string id);
+    Task<TTenantInfo?> TryGetAsync(TId id);
 
 
     /// <summary>

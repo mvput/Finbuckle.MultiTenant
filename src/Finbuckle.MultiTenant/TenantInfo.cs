@@ -6,30 +6,20 @@ using Finbuckle.MultiTenant.Internal;
 
 namespace Finbuckle.MultiTenant;
 
-public class TenantInfo : ITenantInfo
+public class TenantInfo : ITenantInfo<string>
 {
-    private string? id;
+    private string id;
 
-    public TenantInfo()
+    public string Id
     {
-    }
-
-    public string? Id
-    {
-        get
-        {
-            return id;
-        }
+        get => id;
         set
         {
-            if (value != null)
+            if (value.Length > Constants.TenantIdMaxLength)
             {
-                if (value.Length > Constants.TenantIdMaxLength)
-                {
-                    throw new MultiTenantException($"The tenant id cannot exceed {Constants.TenantIdMaxLength} characters.");
-                }
-                id = value;
+                throw new MultiTenantException($"The tenant id cannot exceed {Constants.TenantIdMaxLength} characters.");
             }
+            id = value;
         }
     }
 

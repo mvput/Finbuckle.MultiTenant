@@ -10,7 +10,8 @@ namespace Finbuckle.MultiTenant;
 /// Builder class for Finbuckle.MultiTenant configuration.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>
-public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantInfo, new()
+/// <typeparam name="TId">The identifier type</typeparam>
+public class MultiTenantBuilder<TTenantInfo, TId> where TTenantInfo : class, ITenantInfo<TId>, new() where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets or sets the IServiceCollection instance used by the builder.
@@ -32,9 +33,9 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo, TId> WithStore<TStore>(ServiceLifetime lifetime,
         params object[] parameters)
-        where TStore : IMultiTenantStore<TTenantInfo>
+        where TStore : IMultiTenantStore<TTenantInfo, TId>
         => WithStore<TStore>(lifetime, sp => ActivatorUtilities.CreateInstance<TStore>(sp, parameters));
 
     /// <summary>
@@ -44,9 +45,9 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <param name="factory">A delegate that will create and configure the store.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
     // ReSharper disable once MemberCanBePrivate.Global
-    public MultiTenantBuilder<TTenantInfo> WithStore<TStore>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo, TId> WithStore<TStore>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStore> factory)
-        where TStore : IMultiTenantStore<TTenantInfo>
+        where TStore : IMultiTenantStore<TTenantInfo, TId>
     {
         if (factory == null)
         {
@@ -55,7 +56,7 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
 
         // Note: can't use TryAddEnumerable here because ServiceDescriptor.Describe with a factory can't set implementation type.
         Services.Add(
-            ServiceDescriptor.Describe(typeof(IMultiTenantStore<TTenantInfo>), sp => factory(sp), lifetime));
+            ServiceDescriptor.Describe(typeof(IMultiTenantStore<TTenantInfo, TId>), sp => factory(sp), lifetime));
 
         return this;
     }
@@ -66,7 +67,7 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="parameters">a parameter list for any constructor parameters not covered by dependency injection.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo, TId> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         params object[] parameters) where TStrategy : IMultiTenantStrategy
         => WithStrategy(lifetime, sp => ActivatorUtilities.CreateInstance<TStrategy>(sp, parameters));
 
@@ -76,7 +77,7 @@ public class MultiTenantBuilder<TTenantInfo> where TTenantInfo : class, ITenantI
     /// <param name="lifetime">The service lifetime.</param>
     /// <param name="factory">A delegate that will create and configure the strategy.</param>
     /// <returns>The same MultiTenantBuilder passed into the method.</returns>
-    public MultiTenantBuilder<TTenantInfo> WithStrategy<TStrategy>(ServiceLifetime lifetime,
+    public MultiTenantBuilder<TTenantInfo, TId> WithStrategy<TStrategy>(ServiceLifetime lifetime,
         Func<IServiceProvider, TStrategy> factory)
         where TStrategy : IMultiTenantStrategy
     {

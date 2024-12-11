@@ -15,20 +15,20 @@ namespace Finbuckle.MultiTenant;
 /// Resolves the current tenant.
 /// </summary>
 /// <typeparam name="TTenantInfo">The ITenantInfo implementation type.</typeparam>X
-public class TenantResolver<TTenantInfo> : ITenantResolver<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo, new()
+public class TenantResolver<TTenantInfo, TId> : ITenantResolver<TTenantInfo, TId>
+    where TTenantInfo : class, ITenantInfo<TId>, new()
 {
     private readonly IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options;
     private readonly ILoggerFactory? loggerFactory;
 
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options) :
+        IEnumerable<IMultiTenantStore<TTenantInfo, Tid>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options) :
         this(strategies, stores, options, null)
     {
     }
 
     public TenantResolver(IEnumerable<IMultiTenantStrategy> strategies,
-        IEnumerable<IMultiTenantStore<TTenantInfo>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo>> options,
+        IEnumerable<IMultiTenantStore<TTenantInfo, TId>> stores, IOptionsMonitor<MultiTenantOptions<TTenantInfo, TId>> options,
         ILoggerFactory? loggerFactory)
     {
         Stores = stores;

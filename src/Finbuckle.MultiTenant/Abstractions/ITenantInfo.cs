@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Interface for basic tenant information.
 /// </summary>
-public interface ITenantInfo
+public interface ITenantInfo<out TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     
     /// <summary>
@@ -15,7 +15,7 @@ public interface ITenantInfo
     /// <remarks>
     /// Unlike the Identifier, the id is never intended to be changed.
     /// </remarks>
-    string? Id { get; set; }
+    TId Id { get; }
     
     /// <summary>
     /// Gets or sets a unique identifier for the tenant.
@@ -24,10 +24,10 @@ public interface ITenantInfo
     /// The Identifier is intended for use during tenant resolution and format is determined by convention. For example
     /// a web based strategy may require URL friendly identifiers. Identifiers can be changed if needed.
     /// </remarks>
-    string? Identifier { get; set;  }
+    string? Identifier { get;  }
     
     /// <summary>
     /// Gets or sets a display friendly name for the tenant.
     /// </summary>
-    string? Name { get; set; }
+    string? Name { get;  }
 }
