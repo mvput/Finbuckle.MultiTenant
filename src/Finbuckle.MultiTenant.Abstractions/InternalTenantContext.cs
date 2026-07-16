@@ -7,9 +7,10 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// Contains contextual multi-tenant information.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="TenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TId"></typeparam>
 /// <remarks>The <see cref="TenantInfo"/> property can only be set once. If you attempt to set it more than once, a <see cref="MultiTenantException"/> will be thrown.</remarks>
-internal class InternalTenantContext<TTenantInfo> : ITenantContext<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+internal class InternalTenantContext<TTenantInfo, TId> : ITenantContext<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <inheritdoc />
     /// <remarks>This property can only be set once. If you attempt to set it more than once, a <see cref="MultiTenantException"/> will be thrown.</remarks>
@@ -30,7 +31,7 @@ internal class InternalTenantContext<TTenantInfo> : ITenantContext<TTenantInfo>
     public bool IsResolved => TenantInfo != null;
 
     /// <inheritdoc />
-    ITenantInfo? ITenantContext.TenantInfo
+    ITenantInfo<TId>? ITenantContext<TId>.TenantInfo
     {
         get => TenantInfo;
         set => TenantInfo = (TTenantInfo?)value;
