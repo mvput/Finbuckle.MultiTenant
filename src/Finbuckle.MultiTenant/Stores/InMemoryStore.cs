@@ -8,9 +8,10 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <summary>
 /// Basic store that keeps tenants in memory.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId"></typeparam>
+public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     private readonly Dictionary<string, TTenantInfo> _tenantMap = new(StringComparer.OrdinalIgnoreCase);
     private readonly Lock _tenantMapLock = new();
@@ -23,11 +24,11 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
-            return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id == id));
+            return Task.FromResult(_tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id)));
         }
     }
 
@@ -67,7 +68,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
 
         lock (_tenantMapLock)
         {
-            if (_tenantMap.Values.Any(existing => existing.Id == tenantInfo.Id))
+            if (_tenantMap.Values.Any(existing => existing.Id.Equals(tenantInfo.Id)))
                 return Task.FromResult(false);
 
             return Task.FromResult(_tenantMap.TryAdd(tenantInfo.Identifier, tenantInfo));
@@ -75,11 +76,11 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     }
 
     /// <inheritdoc />
-    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         lock (_tenantMapLock)
         {
-            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == id);
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(id));
             return Task.FromResult(existingTenantInfo?.Identifier is not null &&
                                    _tenantMap.Remove(existingTenantInfo.Identifier));
         }
@@ -101,7 +102,7 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
 
         lock (_tenantMapLock)
         {
-            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id == tenantInfo.Id);
+            var existingTenantInfo = _tenantMap.Values.SingleOrDefault(ti => ti.Id.Equals(tenantInfo.Id));
             if (existingTenantInfo?.Identifier is null)
                 return Task.FromResult(false);
 
@@ -124,8 +125,6 @@ public class InMemoryStore<TTenantInfo> : IMultiTenantStore<TTenantInfo>
     {
         ArgumentNullException.ThrowIfNull(tenantInfo);
 
-        if (string.IsNullOrWhiteSpace(tenantInfo.Id))
-            throw new MultiTenantException("Missing tenant id.");
         if (string.IsNullOrWhiteSpace(tenantInfo.Identifier))
             throw new MultiTenantException("Missing tenant identifier.");
     }

@@ -10,12 +10,13 @@ namespace Finbuckle.MultiTenant;
 /// <summary>
 /// Provides the main API for tenant store interaction.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class TenantManager<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId"></typeparam>
+public class TenantManager<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
-    private readonly IMultiTenantStore<TTenantInfo> _store;
-    private readonly IReadOnlyList<IMultiTenantStoreCache<TTenantInfo>> _caches;
+    private readonly IMultiTenantStore<TTenantInfo, TId> _store;
+    private readonly IReadOnlyList<IMultiTenantStoreCache<TTenantInfo, TId>> _caches;
     private readonly ILoggerFactory? _loggerFactory;
 
     /// <summary>
@@ -24,24 +25,24 @@ public class TenantManager<TTenantInfo>
     /// <param name="store">The primary tenant store.</param>
     /// <param name="caches">The configured tenant store caches.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    public TenantManager(IMultiTenantStore<TTenantInfo> store,
-        IEnumerable<IMultiTenantStoreCache<TTenantInfo>> caches,
+    public TenantManager(IMultiTenantStore<TTenantInfo, TId> store,
+        IEnumerable<IMultiTenantStoreCache<TTenantInfo, TId>> caches,
         ILoggerFactory? loggerFactory = null)
     {
         _store = store ?? throw new ArgumentNullException(nameof(store));
-        _caches = caches?.ToArray() ?? throw new ArgumentNullException(nameof(caches));
+        _caches = caches.ToArray() ?? throw new ArgumentNullException(nameof(caches));
         _loggerFactory = loggerFactory;
     }
 
     /// <summary>
     /// Gets the configured primary tenant store.
     /// </summary>
-    public IMultiTenantStore<TTenantInfo> Store => _store;
+    public IMultiTenantStore<TTenantInfo, TId> Store => _store;
 
     /// <summary>
     /// Gets the configured tenant store caches.
     /// </summary>
-    public IEnumerable<IMultiTenantStoreCache<TTenantInfo>> Caches => _caches;
+    public IEnumerable<IMultiTenantStoreCache<TTenantInfo, TId>> Caches => _caches;
 
     /// <summary>
     /// Try to add the TTenantInfo to the primary store.
@@ -88,7 +89,7 @@ public class TenantManager<TTenantInfo>
     /// <param name="id">TenantId for the tenant to remove.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>True if successfully removed.</returns>
-    public async Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -145,11 +146,11 @@ public class TenantManager<TTenantInfo>
     /// <param name="id">TenantId for the tenant to retrieve.</param>
     /// <param name="cancellationToken">A cancellation token.</param>
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
-    public async Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(id);
 
-        var missedCaches = new List<IMultiTenantStoreCache<TTenantInfo>>();
+        var missedCaches = new List<IMultiTenantStoreCache<TTenantInfo, TId>>();
         foreach (var cache in _caches)
         {
             var result = await GetFromCacheAsync(cache, id, cancellationToken).ConfigureAwait(false);
@@ -193,12 +194,12 @@ public class TenantManager<TTenantInfo>
     }
 
     internal async Task<TTenantInfo?> GetByIdentifierAsync(string identifier,
-        Func<TenantStoreLookupInfo<TTenantInfo>, Task<TTenantInfo?>>? lookupCompleted,
+        Func<TenantStoreLookupInfo<TTenantInfo, TId>, Task<TTenantInfo?>>? lookupCompleted,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(identifier);
 
-        var missedCaches = new List<IMultiTenantStoreCache<TTenantInfo>>();
+        var missedCaches = new List<IMultiTenantStoreCache<TTenantInfo, TId>>();
         foreach (var cache in _caches)
         {
             var tenantInfo = await GetByIdentifierFromCacheAsync(cache, identifier, cancellationToken)
@@ -224,14 +225,14 @@ public class TenantManager<TTenantInfo>
         return storeResult;
     }
 
-    private static async Task<TTenantInfo?> CompleteCacheLookupAsync(IMultiTenantStoreCache<TTenantInfo> cache,
+    private static async Task<TTenantInfo?> CompleteCacheLookupAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache,
         string identifier, TTenantInfo? tenantInfo,
-        Func<TenantStoreLookupInfo<TTenantInfo>, Task<TTenantInfo?>>? lookupCompleted)
+        Func<TenantStoreLookupInfo<TTenantInfo, TId>, Task<TTenantInfo?>>? lookupCompleted)
     {
         if (lookupCompleted is null)
             return tenantInfo;
 
-        return await lookupCompleted(new TenantStoreLookupInfo<TTenantInfo>
+        return await lookupCompleted(new TenantStoreLookupInfo<TTenantInfo, TId>
         {
             Cache = cache,
             Identifier = identifier,
@@ -240,12 +241,12 @@ public class TenantManager<TTenantInfo>
     }
 
     private async Task<TTenantInfo?> CompleteStoreLookupAsync(string identifier, TTenantInfo? tenantInfo,
-        Func<TenantStoreLookupInfo<TTenantInfo>, Task<TTenantInfo?>>? lookupCompleted)
+        Func<TenantStoreLookupInfo<TTenantInfo, TId>, Task<TTenantInfo?>>? lookupCompleted)
     {
         if (lookupCompleted is null)
             return tenantInfo;
 
-        return await lookupCompleted(new TenantStoreLookupInfo<TTenantInfo>
+        return await lookupCompleted(new TenantStoreLookupInfo<TTenantInfo, TId>
         {
             Store = _store,
             Identifier = identifier,
@@ -253,7 +254,7 @@ public class TenantManager<TTenantInfo>
         }).ConfigureAwait(false);
     }
 
-    private async Task FillCachesAsync(IEnumerable<IMultiTenantStoreCache<TTenantInfo>> cachesToFill,
+    private async Task FillCachesAsync(IEnumerable<IMultiTenantStoreCache<TTenantInfo, TId>> cachesToFill,
         TTenantInfo tenantInfo, CancellationToken cancellationToken)
     {
         foreach (var cache in cachesToFill)
@@ -266,7 +267,7 @@ public class TenantManager<TTenantInfo>
         await InvalidateByIdentifierAsync(tenantInfo.Identifier, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task InvalidateByIdAsync(string id, CancellationToken cancellationToken)
+    private async Task InvalidateByIdAsync(TId id, CancellationToken cancellationToken)
     {
         foreach (var cache in _caches)
             await RemoveFromCacheAsync(cache, id, cancellationToken).ConfigureAwait(false);
@@ -278,7 +279,7 @@ public class TenantManager<TTenantInfo>
             await RemoveByIdentifierFromCacheAsync(cache, identifier, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task<TTenantInfo?> GetFromStoreAsync(string id, CancellationToken cancellationToken)
+    private async Task<TTenantInfo?> GetFromStoreAsync(TId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -291,15 +292,15 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.GetAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.GetAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result is not null)
-                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo>.GetAsync)}: Tenant Id \"{{TenantId}}\" found.", id);
+                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo, TId>.GetAsync)}: Tenant Id \"{{TenantId}}\" found.", id);
             else
-                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo>.GetAsync)}: Unable to find Tenant Id \"{{TenantId}}\".", id);
+                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo, TId>.GetAsync)}: Unable to find Tenant Id \"{{TenantId}}\".", id);
         }
 
         return result;
@@ -318,18 +319,18 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.GetByIdentifierAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.GetByIdentifierAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result is not null)
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.GetByIdentifierAsync)}: Tenant found with identifier \"{{TenantIdentifier}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.GetByIdentifierAsync)}: Tenant found with identifier \"{{TenantIdentifier}}\"",
                     identifier);
             else
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.GetByIdentifierAsync)}: Unable to find Tenant with identifier \"{{TenantIdentifier}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.GetByIdentifierAsync)}: Unable to find Tenant with identifier \"{{TenantIdentifier}}\"",
                     identifier);
         }
 
@@ -346,7 +347,7 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.GetAllAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.GetAllAsync)}");
             return [];
         }
     }
@@ -362,7 +363,7 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.GetAllAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.GetAllAsync)}");
             return [];
         }
     }
@@ -384,7 +385,7 @@ public class TenantManager<TTenantInfo>
                 if (logger.IsEnabled(LogLevel.Debug))
                 {
                     logger.LogDebug(
-                        $"{nameof(IMultiTenantStore<TTenantInfo>.AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                        $"{nameof(IMultiTenantStore<TTenantInfo, TId>.AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                         tenantInfo.Id, tenantInfo.Identifier);
                 }
             }
@@ -397,7 +398,7 @@ public class TenantManager<TTenantInfo>
                     if (logger.IsEnabled(LogLevel.Debug))
                     {
                         logger.LogDebug(
-                            $"{nameof(IMultiTenantStore<TTenantInfo>.AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                            $"{nameof(IMultiTenantStore<TTenantInfo, TId>.AddAsync)}: Tenant already exists. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                             tenantInfo.Id, tenantInfo.Identifier);
                     }
                 }
@@ -407,18 +408,18 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.AddAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.AddAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result)
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.AddAsync)}: Tenant added. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                     tenantInfo.Id, tenantInfo.Identifier);
             else
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.AddAsync)}: Unable to add Tenant. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.AddAsync)}: Unable to add Tenant. Id: \"{{TenantId}}\", Identifier: \"{{TenantIdentifier}}\"",
                     tenantInfo.Id, tenantInfo.Identifier);
         }
 
@@ -439,31 +440,31 @@ public class TenantManager<TTenantInfo>
             if (existing is null)
             {
                 if (logger.IsEnabled(LogLevel.Debug))
-                    logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo>.UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
+                    logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo, TId>.UpdateAsync)}: Tenant Id: \"{{TenantId}}\" not found", tenantInfo.Id);
             }
             else
                 result = await _store.UpdateAsync(tenantInfo, cancellationToken).ConfigureAwait(false);
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.UpdateAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.UpdateAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result)
-                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo>.UpdateAsync)}: Tenant Id: \"{{TenantId}}\" updated",
+                logger.LogDebug($"{nameof(IMultiTenantStore<TTenantInfo, TId>.UpdateAsync)}: Tenant Id: \"{{TenantId}}\" updated",
                     tenantInfo.Id);
             else
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.UpdateAsync)}: Unable to update Tenant Id: \"{{TenantId}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.UpdateAsync)}: Unable to update Tenant Id: \"{{TenantId}}\"",
                     tenantInfo.Id);
         }
 
         return result;
     }
 
-    private async Task<bool> RemoveFromStoreAsync(string id, CancellationToken cancellationToken)
+    private async Task<bool> RemoveFromStoreAsync(TId id, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
 
@@ -476,18 +477,18 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.RemoveAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result)
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.RemoveAsync)}: Tenant Id: \"{{TenantId}}\" removed",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveAsync)}: Tenant Id: \"{{TenantId}}\" removed",
                     id);
             else
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.RemoveAsync)}: Unable to remove Tenant Id: \"{{TenantId}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveAsync)}: Unable to remove Tenant Id: \"{{TenantId}}\"",
                     id);
         }
 
@@ -507,25 +508,25 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo>.RemoveByIdentifierAsync)}");
+            logger.LogError(e, $"Exception in {nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveByIdentifierAsync)}");
         }
 
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (result)
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.RemoveByIdentifierAsync)}: Tenant Identifier: \"{{TenantIdentifier}}\" removed",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveByIdentifierAsync)}: Tenant Identifier: \"{{TenantIdentifier}}\" removed",
                     identifier);
             else
                 logger.LogDebug(
-                    $"{nameof(IMultiTenantStore<TTenantInfo>.RemoveByIdentifierAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"",
+                    $"{nameof(IMultiTenantStore<TTenantInfo, TId>.RemoveByIdentifierAsync)}: Unable to remove Tenant Identifier: \"{{TenantIdentifier}}\"",
                     identifier);
         }
 
         return result;
     }
 
-    private async Task<TTenantInfo?> GetFromCacheAsync(IMultiTenantStoreCache<TTenantInfo> cache, string id,
+    private async Task<TTenantInfo?> GetFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, TId id,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
@@ -536,12 +537,12 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo>.GetAsync)}");
+            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo, TId>.GetAsync)}");
             return default;
         }
     }
 
-    private async Task<TTenantInfo?> GetByIdentifierFromCacheAsync(IMultiTenantStoreCache<TTenantInfo> cache,
+    private async Task<TTenantInfo?> GetByIdentifierFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache,
         string identifier, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(identifier);
@@ -553,12 +554,12 @@ public class TenantManager<TTenantInfo>
         catch (Exception e)
         {
             GetLogger(cache).LogError(e,
-                $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo>.GetByIdentifierAsync)}");
+                $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo, TId>.GetByIdentifierAsync)}");
             return default;
         }
     }
 
-    private async Task SetCacheAsync(IMultiTenantStoreCache<TTenantInfo> cache, TTenantInfo tenantInfo,
+    private async Task SetCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, TTenantInfo tenantInfo,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(tenantInfo);
@@ -569,11 +570,11 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo>.SetAsync)}");
+            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo, TId>.SetAsync)}");
         }
     }
 
-    private async Task RemoveFromCacheAsync(IMultiTenantStoreCache<TTenantInfo> cache, string id,
+    private async Task RemoveFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, TId id,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(id);
@@ -584,11 +585,11 @@ public class TenantManager<TTenantInfo>
         }
         catch (Exception e)
         {
-            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo>.RemoveAsync)}");
+            GetLogger(cache).LogError(e, $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo, TId>.RemoveAsync)}");
         }
     }
 
-    private async Task RemoveByIdentifierFromCacheAsync(IMultiTenantStoreCache<TTenantInfo> cache, string identifier,
+    private async Task RemoveByIdentifierFromCacheAsync(IMultiTenantStoreCache<TTenantInfo, TId> cache, string identifier,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(identifier);
@@ -600,7 +601,7 @@ public class TenantManager<TTenantInfo>
         catch (Exception e)
         {
             GetLogger(cache).LogError(e,
-                $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo>.RemoveByIdentifierAsync)}");
+                $"Exception in {nameof(IMultiTenantStoreCache<TTenantInfo, TId>.RemoveByIdentifierAsync)}");
         }
     }
 

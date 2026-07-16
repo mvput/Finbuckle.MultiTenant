@@ -9,9 +9,10 @@ namespace Finbuckle.MultiTenant.StoreCaches;
 /// <summary>
 /// Tenant store cache that uses an <see cref="IMemoryCache"/> instance as its backing.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId"></typeparam>
+public class MemoryCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     private readonly IMemoryCache cache;
     private readonly string keyPrefix;
@@ -31,7 +32,7 @@ public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenant
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         cache.TryGetValue($"{keyPrefix}id__{id}", out TTenantInfo? result);
         return Task.FromResult(result);
@@ -54,7 +55,7 @@ public class MemoryCacheStoreCache<TTenantInfo> : IMultiTenantStoreCache<TTenant
     }
 
     /// <inheritdoc />
-    public Task RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         cache.Remove($"{keyPrefix}id__{id}");
 

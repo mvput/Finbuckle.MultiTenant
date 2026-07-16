@@ -10,8 +10,8 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Basic store that simply returns a tenant based on the identifier without any additional settings.
 /// Note that add, update, and remove functionality is not implemented.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTenantInfo : ITenantInfo
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <inheritdoc />
     public Task<TTenantInfo?> GetByIdentifierAsync(string identifier, CancellationToken cancellationToken = default)
@@ -28,7 +28,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     }
 
     /// <inheritdoc />
-    public Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         var tenantInfo = (TTenantInfo?)RuntimeHelpers.GetUninitializedObject(typeof(TTenantInfo));
         
@@ -63,7 +63,7 @@ public class EchoStore<TTenantInfo> : IMultiTenantStore<TTenantInfo> where TTena
     /// Not implemented in this implementation.
     /// </summary>
     /// <exception cref="NotImplementedException"></exception>
-    public Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }

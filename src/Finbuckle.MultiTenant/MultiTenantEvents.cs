@@ -9,8 +9,9 @@ namespace Finbuckle.MultiTenant;
 /// Events for successful and failed tenant resolution.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class MultiTenantEvents<TTenantInfo>
-    where TTenantInfo : ITenantInfo
+/// <typeparam name="TId"></typeparam>
+public class MultiTenantEvents<TTenantInfo, TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <summary>
     /// Called after each <see cref="IMultiTenantStrategy"/> has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.
@@ -21,18 +22,18 @@ public class MultiTenantEvents<TTenantInfo>
     /// <summary>
     /// Called after each <see cref="IMultiTenantStoreCache{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to advance to the next cache or store.
     /// </summary>
-    public Func<StoreCacheResolveCompletedContext<TTenantInfo>, Task> OnStoreCacheResolveCompleted { get; set; } =
+    public Func<StoreCacheResolveCompletedContext<TTenantInfo, TId>, Task> OnStoreCacheResolveCompleted { get; set; } =
         context => Task.CompletedTask;
 
     /// <summary>
     /// Called after the primary <see cref="IMultiTenantStore{TTenantInfo}"/> has attempted to find the tenant identifier. The resulting <see cref="TenantInfo"/> can be modified if desired or set to null to continue tenant resolution.
     /// </summary>
-    public Func<StoreResolveCompletedContext<TTenantInfo>, Task> OnStoreResolveCompleted { get; set; } =
+    public Func<StoreResolveCompletedContext<TTenantInfo, TId>, Task> OnStoreResolveCompleted { get; set; } =
         context => Task.CompletedTask;
 
     /// <summary>
     /// Called after tenant resolution has completed for all strategies and stores. The resulting tenant information can be modified if desired.
     /// </summary>
-    public Func<TenantResolveCompletedContext<TTenantInfo>, Task> OnTenantResolveCompleted { get; set; } =
+    public Func<TenantResolveCompletedContext<TTenantInfo, TId>, Task> OnTenantResolveCompleted { get; set; } =
         context => Task.CompletedTask;
 }

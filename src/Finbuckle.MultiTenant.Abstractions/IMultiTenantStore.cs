@@ -58,7 +58,6 @@ public interface IMultiTenantStore<TTenantInfo, in TId> where TTenantInfo : ITen
     /// <returns>The found TTenantInfo instance or null if none found.</returns>
     Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default);
 
-
     /// <summary>
     /// Retrieve all the TTenantInfo's from the store.
     /// </summary>
