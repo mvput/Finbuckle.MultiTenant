@@ -17,7 +17,7 @@ namespace Finbuckle.MultiTenant.Identity.EntityFrameworkCore;
 /// </remarks>
 /// </summary>
 public class MultiTenantIdentityDbContext<TId> : MultiTenantIdentityDbContext<IdentityUser, TId>
-    where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     public MultiTenantIdentityDbContext()
@@ -39,7 +39,7 @@ public class MultiTenantIdentityDbContext<TId> : MultiTenantIdentityDbContext<Id
 /// <typeparam name="TUser">The <see cref="IdentityUser"/> derived type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class MultiTenantIdentityDbContext<TUser, TId> : MultiTenantIdentityDbContext<TUser, IdentityRole, string, TId>
-    where TUser : IdentityUser where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TUser : IdentityUser where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     protected MultiTenantIdentityDbContext()
@@ -68,7 +68,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TId> : Mu
     where TUser : IdentityUser<TKey>
     where TRole : IdentityRole<TKey>
     where TKey : IEquatable<TKey>
-    where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     protected MultiTenantIdentityDbContext()
@@ -110,7 +110,7 @@ public abstract class MultiTenantIdentityDbContext<TUser, TRole, TKey, TUserClai
     where TUserToken : IdentityUserToken<TKey>
     where TUserPasskey : IdentityUserPasskey<TKey>
     where TKey : IEquatable<TKey>
-    where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     public ITenantInfo<TId>? TenantInfo { get; set; }

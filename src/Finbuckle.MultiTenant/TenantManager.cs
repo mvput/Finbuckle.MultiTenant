@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class TenantManager<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IMultiTenantStore<TTenantInfo, TId> _store;
     private readonly IReadOnlyList<IMultiTenantStoreCache<TTenantInfo, TId>> _caches;

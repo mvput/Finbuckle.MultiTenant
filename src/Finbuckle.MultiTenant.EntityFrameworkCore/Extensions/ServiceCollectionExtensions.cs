@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddPooledMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction,
         int poolSize = 1024)
-        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         services.AddPooledDbContextFactory<T>(optionsAction, poolSize);
         services.AddScoped<T>(sp =>
@@ -57,7 +57,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The service collection to add registrations to.</param>
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services)
-        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId> => services.AddMultiTenantDbContext<T, TId>((_, _) => { });
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId> => services.AddMultiTenantDbContext<T, TId>((_, _) => { });
 
     /// <summary>
     /// Registers a MultiTenant db context as a scoped service.
@@ -72,7 +72,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<DbContextOptionsBuilder> optionsAction)
-        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId> => services.AddMultiTenantDbContext<T, TId>((_, b) => optionsAction(b));
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId> => services.AddMultiTenantDbContext<T, TId>((_, b) => optionsAction(b));
 
     /// <summary>
     /// Registers a MultiTenant db context as a scoped service.
@@ -87,7 +87,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The same <see cref="IServiceCollection"/> instance for chaining.</returns>
     public static IServiceCollection AddMultiTenantDbContext<T, TId>(this IServiceCollection services,
         Action<IServiceProvider, DbContextOptionsBuilder> optionsAction)
-        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where T : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         services.AddDbContextFactory<T>(optionsAction);
         services.AddScoped<T>(sp =>

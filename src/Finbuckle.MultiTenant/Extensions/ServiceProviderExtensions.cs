@@ -27,7 +27,7 @@ public static class ServiceProviderExtensions
     /// </summary>
     /// <param name="services">The <see cref="IServiceProvider"/> instance the extension method applies to.</param>
     /// <param name="tenantInfo">The tenant information for the new scope.</param>
-    public static void BeginTenantScope<TId>(this IServiceProvider services, ITenantInfo<TId> tenantInfo) where TId : IEquatable<TId>, ISpanParsable<TId>
+    public static void BeginTenantScope<TId>(this IServiceProvider services, ITenantInfo<TId> tenantInfo) where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(tenantInfo);

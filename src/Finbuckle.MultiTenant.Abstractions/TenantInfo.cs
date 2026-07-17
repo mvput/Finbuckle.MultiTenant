@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Default implementation of <see cref="ITenantInfo{TId}"/>.
 /// </summary>
-public class TenantInfo<TId> : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public class TenantInfo<TId> : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     public required TId Id { get; init; }

@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class HttpRemoteStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     // internal for testing, static for use in the client
     internal static readonly string DefaultEndpointTemplateIdentifierToken = $"{{{Constants.TenantToken}}}";

@@ -16,7 +16,7 @@ namespace Finbuckle.MultiTenant.AspNetCore.Authentication;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class MultiTenantAuthenticationService<TTenantInfo, TId> : IAuthenticationService
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IAuthenticationService _inner;
     private readonly IOptionsMonitor<MultiTenantAuthenticationOptions> _multiTenantAuthenticationOptions;

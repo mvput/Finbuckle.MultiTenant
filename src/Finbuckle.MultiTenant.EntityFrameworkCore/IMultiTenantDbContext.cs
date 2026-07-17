@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 /// <summary>
 /// Interface for a <see cref="Microsoft.EntityFrameworkCore.DbContext"/> that supports multi-tenancy.
 /// </summary>
-public interface IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public interface IMultiTenantDbContext<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets or sets the current tenant information for this context.

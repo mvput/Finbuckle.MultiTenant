@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.AspNetCore;
 /// <summary>
 /// Middleware for resolving the <see cref="ITenantContext{TId}"/> for the request.
 /// </summary>
-public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public class MultiTenantMiddleware<TId> where TId : IEquatable<TId>
 {
     private readonly RequestDelegate next;
     private readonly BypassWhenOptions bypassOptions;

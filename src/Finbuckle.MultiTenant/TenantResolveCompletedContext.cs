@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public record TenantResolveCompletedContext<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// The resolved tenant information, or <see langword="null"/> if no tenant was resolved.

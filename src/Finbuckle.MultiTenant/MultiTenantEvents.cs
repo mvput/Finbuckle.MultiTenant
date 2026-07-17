@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class MultiTenantEvents<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Called after each <see cref="IMultiTenantStrategy"/> has run. The resulting identifier can be modified if desired or set to null to advance to the next strategy.

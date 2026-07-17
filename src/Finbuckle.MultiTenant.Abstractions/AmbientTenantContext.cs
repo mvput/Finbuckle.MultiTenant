@@ -9,7 +9,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <typeparam name="TTenantType">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class AmbientTenantContext<TTenantType, TId> : ITenantContext<TTenantType, TId>, ITenantScopeProvider
-    where TTenantType : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantType : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets the ambient tenant context associated with the current asynchronous execution context.

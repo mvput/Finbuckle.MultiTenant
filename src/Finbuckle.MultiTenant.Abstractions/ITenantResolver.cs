@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Resolves the current tenant.
 /// </summary>
-public interface ITenantResolver<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public interface ITenantResolver<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Performs tenant resolution within the given context.
@@ -27,7 +27,7 @@ public interface ITenantResolver<TId> where TId : IEquatable<TId>, ISpanParsable
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public interface ITenantResolver<TTenantInfo, TId> : ITenantResolver<TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Performs tenant resolution within the given context.

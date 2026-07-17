@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> derived type.</typeparam>
 /// <typeparam name="TId"></typeparam>
-public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";
     private readonly IConfigurationSection section;

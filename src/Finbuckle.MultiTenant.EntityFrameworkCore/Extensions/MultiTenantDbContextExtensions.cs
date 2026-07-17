@@ -23,7 +23,7 @@ public static class MultiTenantDbContextExtensions
     /// <typeparam name="TId"></typeparam>
     /// <param name="context">The <see cref="DbContext"/> instance.</param>
     public static void EnforceMultiTenantOnTracking<TContext, TId>(this TContext context)
-        where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         // need to lock and track if the event handler has been registered already so that multiple
         // calls to EnforceMultiTenantOnTracking do not register multiple instances
@@ -56,7 +56,7 @@ public static class MultiTenantDbContextExtensions
     /// <typeparam name="TId"></typeparam>
     /// <param name="context">The <see cref="DbContext"/> instance.</param>
     public static void EnforceMultiTenant<TContext, TId>(this TContext context)
-        where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TContext : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
     {
         var changeTracker = context.ChangeTracker;
         var tenantInfo = context.TenantInfo;
@@ -220,7 +220,7 @@ public static class MultiTenantDbContextExtensions
     public static TContext Create<TContext, TTenantInfo, TId>(TTenantInfo tenantInfo)
         where TContext : DbContext, IMultiTenantDbContext<TId>
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId> => Create<TContext, TTenantInfo,TId>(tenantInfo, []);
+        where TId : IEquatable<TId> => Create<TContext, TTenantInfo,TId>(tenantInfo, []);
 
     /// <summary>
     /// Creates a new instance of a <see cref="DbContext"/> bound to the given tenant, with optional constructor dependencies.
@@ -234,7 +234,7 @@ public static class MultiTenantDbContextExtensions
     public static TContext Create<TContext, TTenantInfo, TId>(TTenantInfo tenantInfo, params object[] args)
         where TContext : DbContext, IMultiTenantDbContext<TId>
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         try
         {

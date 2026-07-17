@@ -24,7 +24,7 @@ public static class OptionsBuilderExtensions
     public static OptionsBuilder<TOptions> ConfigurePerTenant<TOptions, TTenantInfo, TId>(
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -59,7 +59,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -97,7 +97,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -140,7 +140,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -185,7 +185,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -223,7 +223,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -258,7 +258,7 @@ public static class OptionsBuilderExtensions
         this OptionsBuilder<TOptions> optionsBuilder, Action<TOptions, TDep, TTenantInfo> configureOptions)
         where TOptions : class
         where TDep : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -296,7 +296,7 @@ public static class OptionsBuilderExtensions
         where TOptions : class
         where TDep1 : class
         where TDep2 : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -338,7 +338,7 @@ public static class OptionsBuilderExtensions
         where TDep1 : class
         where TDep2 : class
         where TDep3 : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -383,7 +383,7 @@ public static class OptionsBuilderExtensions
         where TDep2 : class
         where TDep3 : class
         where TDep4 : class
-        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>   where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(optionsBuilder);
         ArgumentNullException.ThrowIfNull(configureOptions);

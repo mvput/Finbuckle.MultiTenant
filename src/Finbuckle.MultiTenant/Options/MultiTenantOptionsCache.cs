@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.Options;
 public class MultiTenantOptionsCache<
     [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions, TId>
     : IOptionsMonitorCache<TOptions>
-    where TOptions : class where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TOptions : class where TId : IEquatable<TId>
 {
     private readonly ITenantContext<TId> tenantContext;
 

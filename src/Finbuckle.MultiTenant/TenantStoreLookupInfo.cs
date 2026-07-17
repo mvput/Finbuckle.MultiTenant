@@ -6,7 +6,7 @@ using Finbuckle.MultiTenant.Abstractions;
 namespace Finbuckle.MultiTenant;
 
 internal class TenantStoreLookupInfo<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     public IMultiTenantStore<TTenantInfo, TId>? Store { get; init; }
 

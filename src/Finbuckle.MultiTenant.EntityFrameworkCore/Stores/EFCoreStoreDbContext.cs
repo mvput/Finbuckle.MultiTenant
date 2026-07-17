@@ -12,7 +12,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class EFCoreStoreDbContext<TTenantInfo, TId> : DbContext
-    where TTenantInfo : class, ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : class, ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Initializes a new instance of EFCoreStoreDbContext.

@@ -27,7 +27,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithDistributedCacheStoreCache<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId> => builder.WithDistributedCacheStoreCache(_ => { });
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId> => builder.WithDistributedCacheStoreCache(_ => { });
 
     /// <summary>
     /// Adds a <see cref="DistributedCacheStoreCache{TTenantInfo, TId}"/> to the application.
@@ -40,7 +40,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithDistributedCacheStoreCache<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         Action<DistributedCacheEntryOptions> configureOptions)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -60,7 +60,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithMemoryCacheStoreCache<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId> => builder.WithMemoryCacheStoreCache(_ => { });
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId> => builder.WithMemoryCacheStoreCache(_ => { });
 
     /// <summary>
     /// Adds a <see cref="MemoryCacheStoreCache{TTenantInfo, TId}"/> to the application.
@@ -73,7 +73,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithMemoryCacheStoreCache<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         Action<MemoryCacheEntryOptions> configureOptions)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(configureOptions);
 
@@ -96,7 +96,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithHttpRemoteStore<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder, string endpointTemplate)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
         => builder.WithHttpRemoteStore(endpointTemplate, null);
 
     /// <summary>
@@ -111,7 +111,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithHttpRemoteStore<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         string endpointTemplate,
-        Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        Action<IHttpClientBuilder>? clientConfig) where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
     {
         var httpClientBuilder = builder.Services.AddHttpClient(typeof(HttpRemoteStoreClient<TTenantInfo, TId>).FullName!);
         clientConfig?.Invoke(httpClientBuilder);
@@ -130,7 +130,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithConfigurationStore<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
         => builder.WithStore<ConfigurationStore<TTenantInfo, TId>>(ServiceLifetime.Singleton);
 
     /// <summary>
@@ -146,7 +146,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         IConfiguration configuration,
         string sectionName)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         => builder.WithStore<ConfigurationStore<TTenantInfo, TId>>(ServiceLifetime.Singleton, configuration, sectionName);
 
     /// <summary>
@@ -158,7 +158,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithInMemoryStore<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
         => builder.WithStore<InMemoryStore<TTenantInfo, TId>>(ServiceLifetime.Singleton);
 
     /// <summary>
@@ -170,7 +170,7 @@ public static class MultiTenantBuilderExtensions
     /// <returns>The <see cref="MultiTenantBuilder{TTenantInfo, TId}"/> so that additional calls can be chained.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> WithEchoStore<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
         => builder.WithStore<EchoStore<TTenantInfo, TId>>(ServiceLifetime.Singleton);
 
     /// <summary>
@@ -184,7 +184,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithStaticStrategy<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         string identifier)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
     {
         if (string.IsNullOrWhiteSpace(identifier))
         {
@@ -205,7 +205,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithDelegateStrategy<TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         Func<object, Task<string?>> doStrategy)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(doStrategy);
 
@@ -229,7 +229,7 @@ public static class MultiTenantBuilderExtensions
     public static MultiTenantBuilder<TTenantInfo, TId> WithDelegateStrategy<TContext, TTenantInfo, TId>(
         this MultiTenantBuilder<TTenantInfo, TId> builder,
         Func<TContext, Task<string?>> doStrategy)
-        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId>where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(doStrategy);
 

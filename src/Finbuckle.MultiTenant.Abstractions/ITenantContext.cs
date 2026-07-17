@@ -6,7 +6,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// <summary>
 /// Non-generic interface for the tenant context.
 /// </summary>
-public interface ITenantContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public interface ITenantContext<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Information about the tenant for this context.
@@ -24,7 +24,7 @@ public interface ITenantContext<TId> where TId : IEquatable<TId>, ISpanParsable<
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public interface ITenantContext<TTenantInfo, TId> : ITenantContext<TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Information about the tenant for this context.

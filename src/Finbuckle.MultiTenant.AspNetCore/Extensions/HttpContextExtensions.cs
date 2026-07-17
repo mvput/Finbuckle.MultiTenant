@@ -18,13 +18,13 @@ public static class HttpContextExtensions
         /// <summary>
         /// Returns the current <see cref="ITenantContext{TId}"/>.
         /// </summary>
-        public ITenantContext<TId> TenantContext<TId>() where TId : IEquatable<TId>, ISpanParsable<TId> =>
+        public ITenantContext<TId> TenantContext<TId>() where TId : IEquatable<TId> =>
             httpContext.RequestServices.GetRequiredService<ITenantContext<TId>>();
 
         /// <summary>
         /// Returns the current <see cref="ITenantInfo{TId}"/> instance or null if there is none.
         /// </summary>
-        public ITenantInfo<TId>? TenantInfo<TId>() where TId : IEquatable<TId>, ISpanParsable<TId> =>
+        public ITenantInfo<TId>? TenantInfo<TId>() where TId : IEquatable<TId> =>
             httpContext.TenantContext<TId>().TenantInfo;
 
         /// <summary>
@@ -33,7 +33,7 @@ public static class HttpContextExtensions
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
         /// <typeparam name="TId"></typeparam>
         public ITenantContext<TTenantInfo, TId> GetTenantContext<TTenantInfo, TId>()
-            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {
             return httpContext.RequestServices.GetRequiredService<ITenantContext<TTenantInfo, TId>>();
         }
@@ -44,7 +44,7 @@ public static class HttpContextExtensions
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
         /// <typeparam name="TId"></typeparam>
         public TTenantInfo? GetTenantInfo<TTenantInfo, TId>()
-            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId> =>
+            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId> =>
             httpContext.GetTenantContext<TTenantInfo, TId>().TenantInfo;
 
         /// <summary>
@@ -55,7 +55,7 @@ public static class HttpContextExtensions
         /// <typeparam name="TId"></typeparam>
         /// <remarks>This method will throw a <see cref="MultiTenantException"/> if the <see cref="ITenantContext{TTenantInfo}.TenantInfo"/> has already been set.</remarks>
         public void SetTenantInfo<TTenantInfo, TId>(TTenantInfo tenantInfo)
-            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {
             var tenantContext = httpContext.GetTenantContext<TTenantInfo, TId>();
             tenantContext.TenantInfo = tenantInfo;
@@ -68,7 +68,7 @@ public static class HttpContextExtensions
         /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
         /// <typeparam name="TId"></typeparam>
         public void TrySetTenantInfo<TTenantInfo, TId>(TTenantInfo tenantInfo)
-            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+            where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
         {
             var tenantContext = httpContext.GetTenantContext<TTenantInfo, TId>();
             if (!tenantContext.IsResolved)

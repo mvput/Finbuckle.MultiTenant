@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class TenantResolver<TTenantInfo, TId> : ITenantResolver<TTenantInfo,TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly MultiTenantOptions<TTenantInfo, TId> _options;
     private readonly ILoggerFactory? _loggerFactory;

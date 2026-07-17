@@ -14,7 +14,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 /// </summary>
 public static class EntityTypeBuilderExtensions
 {
-    private class ExpressionVariableScope<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    private class ExpressionVariableScope<TId> where TId : IEquatable<TId>
     {
         // ReSharper disable once UnassignedGetOnlyAutoProperty
         public IMultiTenantDbContext<TId>? Context { get; }
@@ -56,7 +56,7 @@ public static class EntityTypeBuilderExtensions
     /// <param name="builder">The typed <see cref="EntityTypeBuilder"/> instance.</param>
     /// <returns>A <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
     /// <remarks>A string property named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
-    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>, ISpanParsable<TId>
+    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>
     {
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);

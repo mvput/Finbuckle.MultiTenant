@@ -15,7 +15,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
     where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo, TId>
     where TTenantInfo : class, ITenantInfo<TId>
-    where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TId : IEquatable<TId>
 {
     // internal for testing
     internal readonly TEFCoreStoreDbContext dbContext;

@@ -10,7 +10,7 @@ namespace Finbuckle.MultiTenant;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
-public class MultiTenantOptions<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public class MultiTenantOptions<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     /// <summary>
     /// Gets or sets the type of <see cref="TenantInfo{TId}"/> derived.

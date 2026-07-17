@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo, TId}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> AddMultiTenant<TTenantInfo, TId>(this IServiceCollection services,
         Action<MultiTenantOptions<TTenantInfo, TId>> config)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
         services.AddScoped<ITenantResolver<TTenantInfo, TId>, TenantResolver<TTenantInfo, TId>>();
         services.AddScoped<ITenantResolver<TId>>(sp => sp.GetRequiredService<ITenantResolver<TTenantInfo, TId>>());
@@ -49,7 +49,7 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The <see cref="IServiceCollection"/> instance the extension method applies to.</param>
     /// <returns>A new instance of <see cref="MultiTenantBuilder{TTenantInfo, TId}"/>.</returns>
     public static MultiTenantBuilder<TTenantInfo, TId> AddMultiTenant<TTenantInfo, TId>(this IServiceCollection services)
-        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
     {
         return services.AddMultiTenant<TTenantInfo, TId>(_ => { });
     }
@@ -151,7 +151,7 @@ public static class ServiceCollectionExtensions
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo : ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -186,7 +186,7 @@ public static class ServiceCollectionExtensions
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo :  ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         return services.ConfigurePerTenant<TOptions, TTenantInfo, TId>(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -205,7 +205,7 @@ public static class ServiceCollectionExtensions
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo :  ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         return services.ConfigurePerTenant<TOptions, TTenantInfo, TId>(null, configureOptions);
     }
@@ -225,7 +225,7 @@ public static class ServiceCollectionExtensions
         string? name, Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo :  ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configureOptions);
@@ -260,7 +260,7 @@ public static class ServiceCollectionExtensions
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo :  ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         return services.PostConfigurePerTenant<TOptions, TTenantInfo, TId>(Microsoft.Extensions.Options.Options.DefaultName, configureOptions);
     }
@@ -279,7 +279,7 @@ public static class ServiceCollectionExtensions
         Action<TOptions, TTenantInfo> configureOptions)
         where TOptions : class
         where TTenantInfo :  ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         return services.PostConfigurePerTenant<TOptions, TTenantInfo, TId>(null, configureOptions);
     }
@@ -291,7 +291,7 @@ public static class ServiceCollectionExtensions
     /// <typeparam name="TId"></typeparam>
     /// <param name="services">The <see cref="IServiceCollection"/> to add the services to.</param>
     internal static void ConfigurePerTenantReqs<TOptions, TId>(IServiceCollection services)
-        where TOptions : class where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TOptions : class where TId : IEquatable<TId>
     {
         ArgumentNullException.ThrowIfNull(services);
 

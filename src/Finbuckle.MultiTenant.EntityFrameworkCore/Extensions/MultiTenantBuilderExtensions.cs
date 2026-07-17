@@ -25,7 +25,7 @@ public static class MultiTenantBuilderExtensions
         this MultiTenantBuilder<TTenantInfo, TId> builder)
         where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo, TId>
         where TTenantInfo : class, ITenantInfo<TId>
-        where TId : IEquatable<TId>, ISpanParsable<TId>
+        where TId : IEquatable<TId>
     {
         builder.Services
             .AddDbContext<TEFCoreStoreDbContext>(); // Note, will not override existing context if already added.

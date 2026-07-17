@@ -11,7 +11,7 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore;
 /// <summary>
 /// A <see cref="DbContext"/> that enforces tenant integrity on multi-tenant entity types.
 /// </summary>
-public abstract class MultiTenantDbContext<TId> : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public abstract class MultiTenantDbContext<TId> : DbContext, IMultiTenantDbContext<TId> where TId : IEquatable<TId>
 {
     /// <inheritdoc />
     public ITenantInfo<TId>? TenantInfo { get; set; }

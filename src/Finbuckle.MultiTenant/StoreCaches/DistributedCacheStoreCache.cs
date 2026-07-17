@@ -13,7 +13,7 @@ namespace Finbuckle.MultiTenant.StoreCaches;
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
 public class DistributedCacheStoreCache<TTenantInfo, TId> : IMultiTenantStoreCache<TTenantInfo, TId>
-    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+    where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>
 {
     private readonly IDistributedCache cache;
     private readonly string keyPrefix;
