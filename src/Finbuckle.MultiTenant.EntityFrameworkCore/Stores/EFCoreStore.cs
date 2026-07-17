@@ -9,11 +9,13 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 /// <summary>
 /// A multi-tenant store that uses Entity Framework Core for tenant storage.
 /// </summary>
-/// <typeparam name="TEFCoreStoreDbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo}"/> implementation type.</typeparam>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> implementation type.</typeparam>
-public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore<TTenantInfo>
-    where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo>
-    where TTenantInfo : class, ITenantInfo
+/// <typeparam name="TEFCoreStoreDbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo, TId}"/> implementation type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId"></typeparam>
+public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId>
+    where TEFCoreStoreDbContext : EFCoreStoreDbContext<TTenantInfo, TId>
+    where TTenantInfo : class, ITenantInfo<TId>
+    where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     // internal for testing
     internal readonly TEFCoreStoreDbContext dbContext;
@@ -21,7 +23,7 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     /// <summary>
     /// Initializes a new instance of EFCoreStore.
     /// </summary>
-    /// <param name="dbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo}"/> instance.</param>
+    /// <param name="dbContext">The <see cref="EFCoreStoreDbContext{TTenantInfo, TId}"/> instance.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="dbContext"/> is null.</exception>
     public EFCoreStore(TEFCoreStoreDbContext dbContext)
     {
@@ -29,10 +31,10 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     }
 
     /// <inheritdoc />
-    public virtual async Task<TTenantInfo?> GetAsync(string id, CancellationToken cancellationToken = default)
+    public virtual async Task<TTenantInfo?> GetAsync(TId id, CancellationToken cancellationToken = default)
     {
         return await dbContext.TenantInfo.AsNoTracking()
-            .Where(ti => ti.Id == id)
+            .Where(ti => ti.Id.Equals(id))
             .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
     }
 
@@ -70,10 +72,10 @@ public class EFCoreStore<TEFCoreStoreDbContext, TTenantInfo> : IMultiTenantStore
     }
 
     /// <inheritdoc />
-    public virtual async Task<bool> RemoveAsync(string id, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> RemoveAsync(TId id, CancellationToken cancellationToken = default)
     {
         var existing = await dbContext.TenantInfo
-            .Where(ti => ti.Id == id)
+            .Where(ti => ti.Id .Equals(id))
             .SingleOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
         if (existing is null)

@@ -14,10 +14,10 @@ namespace Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 /// </summary>
 public static class EntityTypeBuilderExtensions
 {
-    private class ExpressionVariableScope
+    private class ExpressionVariableScope<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
     {
         // ReSharper disable once UnassignedGetOnlyAutoProperty
-        public IMultiTenantDbContext? Context { get; }
+        public IMultiTenantDbContext<TId>? Context { get; }
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public static class EntityTypeBuilderExtensions
     /// <param name="builder">The typed <see cref="EntityTypeBuilder"/> instance.</param>
     /// <returns>A <see cref="MultiTenantEntityTypeBuilder"/> instance.</returns>
     /// <remarks>A string property named TenantId is used in the query filter. If one does not already exist on the entity a shadow property is used.</remarks>
-    public static MultiTenantEntityTypeBuilder IsMultiTenant(this EntityTypeBuilder builder)
+    public static MultiTenantEntityTypeBuilder IsMultiTenant<TId>(this EntityTypeBuilder builder) where TId : IEquatable<TId>, ISpanParsable<TId>
     {
         if (builder.Metadata.IsMultiTenant())
             return new MultiTenantEntityTypeBuilder(builder);
@@ -86,12 +86,12 @@ public static class EntityTypeBuilderExtensions
 
         // build up express tree for: TenantInfo.Id
         // EF will magically sub the current db context in for scope.Context
-        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope());
-        var contextMemberInfo = typeof(ExpressionVariableScope).GetMember(nameof(ExpressionVariableScope.Context))[0];
+        var scopeConstantExp = Expression.Constant(new ExpressionVariableScope<TId>());
+        var contextMemberInfo = typeof(ExpressionVariableScope<TId>).GetMember(nameof(ExpressionVariableScope<TId>.Context))[0];
         var contextMemberAccessExp = Expression.MakeMemberAccess(scopeConstantExp, contextMemberInfo);
         var contextTenantInfoExp =
-            Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext.TenantInfo));
-        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext.TenantInfo.Id));
+            Expression.Property(contextMemberAccessExp, nameof(IMultiTenantDbContext<TId>.TenantInfo));
+        var rightExp = Expression.Property(contextTenantInfoExp, nameof(IMultiTenantDbContext<TId>.TenantInfo.Id));
 
         // build expression tree for EF.Property<string>(e, "TenantId") == TenantInfo.Id'
         var predicate = Expression.Equal(leftExp, rightExp);
