@@ -33,6 +33,7 @@ public class MultiTenantEvents<TTenantInfo, TId>
 
     /// <summary>
     /// Called after tenant resolution has completed for all strategies and stores. The resulting tenant information can be modified if desired.
+    /// </summary>
     public Func<TenantResolveCompletedContext<TTenantInfo, TId>, Task> OnTenantResolveCompleted { get; set; } =
         context => Task.CompletedTask;
 }

@@ -8,7 +8,7 @@ namespace Finbuckle.MultiTenant.Abstractions;
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
 /// <typeparam name="TId"></typeparam>
-public interface IMultiTenantStoreCache<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
+public interface IMultiTenantStoreCache<TTenantInfo, in TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <summary>
     /// Retrieve the TTenantInfo for a given tenant Id.
