@@ -13,7 +13,8 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Basic store that uses .NET configuration to define tenants. Note that add, update, and remove functionality is not
 /// implemented. If the underlying configuration supports reload-on-change, then this store will reflect such changes.
 /// </summary>
-/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo"/> derived type.</typeparam>
+/// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> derived type.</typeparam>
+/// <typeparam name="TId"></typeparam>
 public class ConfigurationStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     private const string DefaultSectionName = "Finbuckle:MultiTenant:Stores:ConfigurationStore";

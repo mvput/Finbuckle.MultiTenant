@@ -11,6 +11,7 @@ namespace Finbuckle.MultiTenant.Stores;
 /// Note that add, update, and remove functionality is not implemented.
 /// </summary>
 /// <typeparam name="TTenantInfo">The <see cref="ITenantInfo{TId}"/> implementation type.</typeparam>
+/// <typeparam name="TId"></typeparam>
 public class EchoStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TId> where TTenantInfo : ITenantInfo<TId> where TId : IEquatable<TId>, ISpanParsable<TId>
 {
     /// <inheritdoc />
