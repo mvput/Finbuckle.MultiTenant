@@ -32,26 +32,26 @@ The following happens when `WithPerTenantAuthentication()` is called:
 - Cookie sign-in events are modified to add a tenant claim during sign-in. Existing
   sign-in events are preserved.
 - Cookie validation events are modified to validate that a tenant claim exists
-  which matches the current requests tenant. Existing validation events are
+  which matches the current request's tenant. Existing validation events are
   preserved.
 
 The following also happens if the `TenantInfo` derived class has the appropriate property:
 
 - The default challenge scheme is set to the `ChallengeScheme` property
   of the `TenantInfo` derived class.
-- 'LoginPath' for cookie authentication is set to the `CookieLoginPath` property
+- `LoginPath` for cookie authentication is set to the `CookieLoginPath` property
   of the `TenantInfo` derived class.
-- 'LogoutPath' for cookie authentication is set to the `CookieLogoutPath`
+- `LogoutPath` for cookie authentication is set to the `CookieLogoutPath`
   property of the `TenantInfo` derived class.
-- 'AccessDeniedPath' for cookie authentication is set to the
+- `AccessDeniedPath` for cookie authentication is set to the
   `CookieAccessDeniedPath` property of the `TenantInfo` derived class.
 - Several internal services are registered to support remote authentication such
   as OAuth 2.0 and OpenID Connect.
-- `Authority` for OpenID connect authentication is set to the
+- `Authority` for OpenID Connect authentication is set to the
   `OpenIdConnectAuthority` property of the `TenantInfo` derived class.
-- `ClientId` for OpenID connect authentication is set to the
+- `ClientId` for OpenID Connect authentication is set to the
   `OpenIdConnectClientId` property of the `TenantInfo` derived class.
-- `ClientSecret` for OpenID connect authentication is set to the
+- `ClientSecret` for OpenID Connect authentication is set to the
   `OpenIdConnectClientSecret` property of the `TenantInfo` derived class.
 
 If the `TenantInfo` derived class lacks one of these properties there is no
@@ -66,9 +66,9 @@ authentication. This behavior means only a single tenant sign-in can be active.
 See [other authentication options](#other-authentication-options) below if a
 separate sign-in cookie for each tenant is required.
 
-By changing the default challenge per-tenant, the user can be redirected to a
+By changing the default challenge per tenant, users can be redirected to a
 different scheme as needed. Combined with a per-tenant OpenID Connect authority,
-this can route to shared or tenant specific authentication infrastructure.
+this can route to shared or tenant-specific authentication infrastructure.
 
 The `CookieLoginPath`, `CookieLogoutPath`, `CookieAccessDeniedPath`, `OpenIdConnectAuthority`, `OpenIdConnectClientId`
 , `OpenIdConnectClientSecret` properties can use a template format where `__tenant__`
@@ -79,7 +79,24 @@ will be replaced with the identifier for each specific tenant. For example, a
 The code setup is straightforward:
 
 ```csharp
-using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using Finbuckle.MultiTenant.Extensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+
+public class AppTenantInfo : TenantInfo
+{
+    public string? ChallengeScheme { get; set; }
+    public string? CookieLoginPath { get; set; }
+    public string? CookieLogoutPath { get; set; }
+    public string? CookieAccessDeniedPath { get; set; }
+    public string? OpenIdConnectAuthority { get; set; }
+    public string? OpenIdConnectClientId { get; set; }
+    public string? OpenIdConnectClientSecret { get; set; }
+    public string? JwtAuthority { get; set; }
+}
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -127,7 +144,6 @@ work.
 {
   "Finbuckle:MultiTenant:Stores:ConfigurationStore": {
     "Defaults": {
-      "ConnectionString": "",
       "CookieLoginPath": "/__tenant__/home/login",
       "CookieLogoutPath": "/__tenant__/home/logout"
     },
