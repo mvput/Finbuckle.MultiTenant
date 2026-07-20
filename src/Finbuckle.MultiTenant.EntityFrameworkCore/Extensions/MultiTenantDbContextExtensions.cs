@@ -279,4 +279,4 @@ public static class MultiTenantDbContextExtensions
                 "The provided DbContext type does not have a constructor that accepts the required parameters.", e);
         }
     }
-}
+} 

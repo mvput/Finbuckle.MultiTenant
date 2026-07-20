@@ -49,10 +49,10 @@ public class MultiTenantOptionsCacheShould
     [Fact]
     public void ThrowForNullConstructorParameterFactoryAndOptions()
     {
-        var tenantContext = new AmbientTenantContext<TenantInfo>();
-        var cache = new MultiTenantOptionsCache<TestOptions>(tenantContext);
+        var tenantContext = new AmbientTenantContext<TenantInfo,string>();
+        var cache = new MultiTenantOptionsCache<TestOptions, string>(tenantContext);
 
-        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions>(null!));
+        Assert.Throws<ArgumentNullException>(() => new MultiTenantOptionsCache<TestOptions, string>(null!));
         Assert.Throws<ArgumentNullException>(() => cache.GetOrAdd("name", null!));
         Assert.Throws<ArgumentNullException>(() => cache.TryAdd("name", null!));
     }
@@ -237,15 +237,15 @@ public class MultiTenantOptionsCacheShould
         Assert.Equal("new", cache.GetOrAdd("name", () => new TestOptions { Value = "new" }).Value);
     }
 
-    private static (MultiTenantOptionsCache<TestOptions> Cache, AmbientTenantContext<TenantInfo> Context) CreateCache()
+    private static (MultiTenantOptionsCache<TestOptions,string> Cache, AmbientTenantContext<TenantInfo,string> Context) CreateCache()
     {
-        var context = new AmbientTenantContext<TenantInfo>();
+        var context = new AmbientTenantContext<TenantInfo,string>();
         SetNoTenant(context);
-        return (new MultiTenantOptionsCache<TestOptions>(context), context);
+        return (new MultiTenantOptionsCache<TestOptions, string>(context), context);
     }
 
-    private static TestOptions Add(MultiTenantOptionsCache<TestOptions> cache,
-        AmbientTenantContext<TenantInfo> context, string tenantId, string? name)
+    private static TestOptions Add(MultiTenantOptionsCache<TestOptions, string> cache,
+        AmbientTenantContext<TenantInfo,string> context, string tenantId, string? name)
     {
         SetTenant(context, tenantId);
         var options = new TestOptions();
@@ -253,11 +253,11 @@ public class MultiTenantOptionsCacheShould
         return options;
     }
 
-    private static void SetTenant(AmbientTenantContext<TenantInfo> context, string tenantId)
+    private static void SetTenant(AmbientTenantContext<TenantInfo, string> context, string tenantId)
     {
         context.BeginScope();
         context.TenantInfo = new TenantInfo { Id = tenantId, Identifier = tenantId };
     }
 
-    private static void SetNoTenant(AmbientTenantContext<TenantInfo> context) => context.BeginScope();
+    private static void SetNoTenant(AmbientTenantContext<TenantInfo, string> context) => context.BeginScope();
 }

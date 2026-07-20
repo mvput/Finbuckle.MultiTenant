@@ -16,26 +16,26 @@ namespace Finbuckle.MultiTenant.AspNetCore.Test;
 
 public class MultiTenantMiddlewareShould
 {
-    private static MultiTenantMiddleware CreateMiddleware(RequestDelegate next,
+    private static MultiTenantMiddleware<string> CreateMiddleware(RequestDelegate next,
         BypassWhenOptions? bypassOptions = null,
-        ShortCircuitWhenOptions? shortCircuitOptions = null)
+        ShortCircuitWhenOptions<string>? shortCircuitOptions = null)
         => new(next,
             MsOptions.Create(bypassOptions ?? new BypassWhenOptions()),
-            MsOptions.Create(shortCircuitOptions ?? new ShortCircuitWhenOptions()));
+            MsOptions.Create(shortCircuitOptions ?? new ShortCircuitWhenOptions<string>()));
 
-    private static Task InvokeMiddleware(MultiTenantMiddleware mw, HttpContext context, IServiceProvider sp) =>
+    private static Task InvokeMiddleware(MultiTenantMiddleware<string> mw, HttpContext context, IServiceProvider sp) =>
         mw.Invoke(context,
-            sp.GetRequiredService<ITenantContext>(),
-            sp.GetRequiredService<ITenantResolver>(),
+            sp.GetRequiredService<ITenantContext<string>>(),
+            sp.GetRequiredService<ITenantResolver<string>>(),
             sp.GetRequiredService<ITenantScopeProvider>());
 
     [Fact]
     public async Task ResolveTenantContextIfTenantFound()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo, string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -45,10 +45,10 @@ public class MultiTenantMiddlewareShould
         context.Setup(c => c.Items).Returns(itemsDict);
         context.Setup(c => c.Features).Returns(new FeatureCollection());
 
-        ITenantInfo? observedTenant = null;
+        ITenantInfo<string>? observedTenant = null;
         var mw = CreateMiddleware(_ =>
         {
-            observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo;
+            observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo,string>>().TenantInfo;
             return Task.CompletedTask;
         });
 
@@ -62,9 +62,9 @@ public class MultiTenantMiddlewareShould
     public async Task NotShortCircuitIfTenantFound()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -78,15 +78,15 @@ public class MultiTenantMiddlewareShould
 
         var calledNext = false;
         var resolvedInPredicate = false;
-        ITenantInfo? observedTenant = null;
+        ITenantInfo<string>? observedTenant = null;
         var mw = CreateMiddleware(
             _ =>
             {
                 calledNext = true;
-                observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo;
+                observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo,string>>().TenantInfo;
                 return Task.CompletedTask;
             },
-            shortCircuitOptions: new ShortCircuitWhenOptions
+            shortCircuitOptions: new ShortCircuitWhenOptions<string>
             {
                 Predicate = mtc =>
                 {
@@ -108,9 +108,9 @@ public class MultiTenantMiddlewareShould
     public async Task SetTenantContext()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -124,7 +124,7 @@ public class MultiTenantMiddlewareShould
         TenantInfo? observedTenant = null;
         var mw = CreateMiddleware(_ =>
         {
-            var tenantContext = sp.GetRequiredService<ITenantContext<TenantInfo>>();
+            var tenantContext = sp.GetRequiredService<ITenantContext<TenantInfo,string>>();
             resolved = tenantContext.IsResolved;
             observedTenant = tenantContext.TenantInfo;
             return Task.CompletedTask;
@@ -140,9 +140,9 @@ public class MultiTenantMiddlewareShould
     public async Task NotResolveTenantIfNoTenantFound()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("not_initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("not_initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -156,7 +156,7 @@ public class MultiTenantMiddlewareShould
         TenantInfo? observedTenant = null;
         var mw = CreateMiddleware(_ =>
         {
-            var tenantContext = sp.GetRequiredService<ITenantContext<TenantInfo>>();
+            var tenantContext = sp.GetRequiredService<ITenantContext<TenantInfo,string>>();
             resolved = tenantContext.IsResolved;
             observedTenant = tenantContext.TenantInfo;
             return Task.CompletedTask;
@@ -172,9 +172,9 @@ public class MultiTenantMiddlewareShould
     public async Task ShortCircuitIfNoTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("not_initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("not_initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -188,14 +188,14 @@ public class MultiTenantMiddlewareShould
 
         var calledNext = false;
         bool? resolvedInPredicate = null;
-        ITenantInfo? observedTenant = null;
+        ITenantInfo<string>? observedTenant = null;
         var mw = CreateMiddleware(
             _ =>
             {
                 calledNext = true;
                 return Task.CompletedTask;
             },
-            shortCircuitOptions: new ShortCircuitWhenOptions
+            shortCircuitOptions: new ShortCircuitWhenOptions<string>
             {
                 Predicate = mtc =>
                 {
@@ -217,9 +217,9 @@ public class MultiTenantMiddlewareShould
     public async Task ShortCircuitAndRedirectIfNoTenant()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("not_initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("not_initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -233,14 +233,14 @@ public class MultiTenantMiddlewareShould
 
         var calledNext = false;
         bool? resolvedInPredicate = null;
-        ITenantInfo? observedTenant = null;
+        ITenantInfo<string>? observedTenant = null;
         var mw = CreateMiddleware(
             _ =>
             {
                 calledNext = true;
                 return Task.CompletedTask;
             },
-            shortCircuitOptions: new ShortCircuitWhenOptions
+            shortCircuitOptions: new ShortCircuitWhenOptions<string>
             {
                 Predicate = mtc =>
                 {
@@ -263,9 +263,9 @@ public class MultiTenantMiddlewareShould
     public async Task BypassResolutionWhenNoEndpointAndOptionEnabled()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -295,9 +295,9 @@ public class MultiTenantMiddlewareShould
     public async Task DoesNotBypassResolutionWhenEndpointExistsAndOptionEnabled()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         // Set up an endpoint on the feature collection so GetEndpoint() returns non-null.
@@ -333,9 +333,9 @@ public class MultiTenantMiddlewareShould
     public async Task DoesNotBypassResolutionWhenNoEndpointAndOptionDisabled()
     {
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>().WithStaticStrategy("initech").WithInMemoryStore();
+        services.AddMultiTenant<TenantInfo,string>().WithStaticStrategy("initech").WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo>>();
+        var store = sp.GetRequiredService<IMultiTenantStore<TenantInfo,string>>();
         await store.AddAsync(new TenantInfo { Id = "initech", Identifier = "initech" });
 
         var context = new Mock<HttpContext>();
@@ -351,7 +351,7 @@ public class MultiTenantMiddlewareShould
             _ =>
             {
                 calledNext = true;
-                observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo;
+                observedTenant = sp.GetRequiredService<ITenantContext<TenantInfo,string>>().TenantInfo;
                 return Task.CompletedTask;
             });
         // No bypassOptions = null predicate = no bypass applied
@@ -369,11 +369,11 @@ public class MultiTenantMiddlewareShould
     {
         var currentIdentifier = "tenant-1";
         var services = new ServiceCollection();
-        services.AddMultiTenant<TenantInfo>()
+        services.AddMultiTenant<TenantInfo,string>()
             .WithDelegateStrategy(_ => Task.FromResult<string?>(currentIdentifier))
             .WithInMemoryStore();
         var sp = services.BuildServiceProvider();
-        var tenantManager = sp.GetRequiredService<TenantManager<TenantInfo>>();
+        var tenantManager = sp.GetRequiredService<TenantManager<TenantInfo,string>>();
         await tenantManager.AddAsync(new TenantInfo { Id = "tenant-1", Identifier = "tenant-1" });
         await tenantManager.AddAsync(new TenantInfo { Id = "tenant-2", Identifier = "tenant-2" });
         var context = new Mock<HttpContext>();
@@ -383,7 +383,7 @@ public class MultiTenantMiddlewareShould
         var observations = new List<string?>();
         var mw = CreateMiddleware(_ =>
         {
-            observations.Add(sp.GetRequiredService<ITenantContext<TenantInfo>>().TenantInfo?.Identifier);
+            observations.Add(sp.GetRequiredService<ITenantContext<TenantInfo,string>>().TenantInfo?.Identifier);
             return Task.CompletedTask;
         });
 

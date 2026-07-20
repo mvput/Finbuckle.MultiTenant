@@ -69,7 +69,7 @@ public class DistributedCacheStoreCacheShould
                 Identifier = "lol"
             })));
 
-        var cache = new DistributedCacheStoreCache<TenantInfo>(distributedCache.Object, Constants.TenantToken,
+        var cache = new DistributedCacheStoreCache<TenantInfo, string>(distributedCache.Object, Constants.TenantToken,
             new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) });
 
         await cache.GetAsync("lol-id");
@@ -84,7 +84,7 @@ public class DistributedCacheStoreCacheShould
             .ReturnsAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new TenantInfo
                 { Id = "lol-id", Identifier = "lol" })));
 
-        var cache = new DistributedCacheStoreCache<TenantInfo>(distributedCache.Object, Constants.TenantToken,
+        var cache = new DistributedCacheStoreCache<TenantInfo, string>(distributedCache.Object, Constants.TenantToken,
             new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.FromSeconds(1) });
 
         await cache.GetByIdentifierAsync("lol-id");
@@ -105,18 +105,18 @@ public class DistributedCacheStoreCacheShould
             })
             .Returns(Task.CompletedTask);
 
-        var cache = new DistributedCacheStoreCache<TenantInfo>(distributedCache.Object, Constants.TenantToken, options);
+        var cache = new DistributedCacheStoreCache<TenantInfo, string>(distributedCache.Object, Constants.TenantToken, options);
 
         await cache.SetAsync(new TenantInfo { Id = "test-id", Identifier = "test" });
     }
 
-    private static async Task<IMultiTenantStoreCache<TenantInfo>> CreateTestCache()
+    private static async Task<IMultiTenantStoreCache<TenantInfo, string>> CreateTestCache()
     {
         var services = new ServiceCollection();
         services.AddOptions().AddDistributedMemoryCache();
         var sp = services.BuildServiceProvider();
 
-        var cache = new DistributedCacheStoreCache<TenantInfo>(sp.GetRequiredService<IDistributedCache>(),
+        var cache = new DistributedCacheStoreCache<TenantInfo, string>(sp.GetRequiredService<IDistributedCache>(),
             Constants.TenantToken, new DistributedCacheEntryOptions { SlidingExpiration = TimeSpan.MaxValue });
 
         await cache.SetAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" });

@@ -38,18 +38,18 @@ public class HttpRemoteStoreClientShould
         }
     }
 
-    private static HttpRemoteStoreClient<TenantInfo> CreateClient(TestHandler handler,
+    private static HttpRemoteStoreClient<TenantInfo,string> CreateClient(TestHandler handler,
         JsonSerializerOptions? serializerOptions = null)
     {
         var factory = new Mock<IHttpClientFactory>();
         factory.Setup(f => f.CreateClient(It.IsAny<string>())).Returns(new HttpClient(handler));
-        return new HttpRemoteStoreClient<TenantInfo>(factory.Object, serializerOptions);
+        return new HttpRemoteStoreClient<TenantInfo,string>(factory.Object, serializerOptions);
     }
 
     [Fact]
     public void ThrowIfHttpClientFactoryIsNull()
     {
-        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo>(null!));
+        Assert.Throws<ArgumentNullException>(() => new HttpRemoteStoreClient<TenantInfo,string>(null!));
     }
 
     [Fact]
@@ -153,7 +153,7 @@ public class HttpRemoteStoreClientShould
             await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
             return new HttpResponseMessage(HttpStatusCode.OK);
         });
-        var store = new HttpRemoteStore<TenantInfo>(CreateClient(handler), "https://example.com/{__tenant__}");
+        var store = new HttpRemoteStore<TenantInfo, string>(CreateClient(handler), "https://example.com/{__tenant__}");
         using var cancellationTokenSource = new CancellationTokenSource();
 
         var request = store.GetByIdentifierAsync("initech", cancellationTokenSource.Token);

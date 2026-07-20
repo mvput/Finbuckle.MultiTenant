@@ -58,7 +58,7 @@ public class MemoryCacheStoreCacheShould
     public async Task ApplyConfiguredOptionsOnSet()
     {
         using var memoryCache = new MemoryCache(new MemoryCacheOptions());
-        var cache = new MemoryCacheStoreCache<TenantInfo>(memoryCache, Constants.TenantToken,
+        var cache = new MemoryCacheStoreCache<TenantInfo, string>(memoryCache, Constants.TenantToken,
             new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = TimeSpan.FromMilliseconds(1) });
 
         await cache.SetAsync(new TenantInfo { Id = "test-id", Identifier = "test" });
@@ -68,9 +68,9 @@ public class MemoryCacheStoreCacheShould
         Assert.Null(await cache.GetByIdentifierAsync("test"));
     }
 
-    private static IMultiTenantStoreCache<TenantInfo> CreateTestCache()
+    private static IMultiTenantStoreCache<TenantInfo, string> CreateTestCache()
     {
-        var cache = new MemoryCacheStoreCache<TenantInfo>(new MemoryCache(new MemoryCacheOptions()),
+        var cache = new MemoryCacheStoreCache<TenantInfo, string>(new MemoryCache(new MemoryCacheOptions()),
             Constants.TenantToken, new MemoryCacheEntryOptions { SlidingExpiration = TimeSpan.MaxValue });
 
         cache.SetAsync(new TenantInfo { Id = "initech-id", Identifier = "initech" }).GetAwaiter().GetResult();

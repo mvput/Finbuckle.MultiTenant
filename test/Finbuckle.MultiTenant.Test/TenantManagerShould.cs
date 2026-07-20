@@ -15,7 +15,7 @@ public class TenantManagerShould
         var store = new TestStore();
         var cache = new TestCache();
         await cache.SetAsync(tenant);
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -30,7 +30,7 @@ public class TenantManagerShould
         var firstCache = new TestCache();
         var secondCache = new TestCache();
         await secondCache.SetAsync(tenant);
-        var manager = new TenantManager<TenantInfo>(new TestStore(), [firstCache, secondCache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(), [firstCache, secondCache]);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -45,7 +45,7 @@ public class TenantManagerShould
         var store = new TestStore();
         var cache = new TestCache();
         await cache.SetAsync(tenant);
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetAsync("initech-id");
 
@@ -60,7 +60,7 @@ public class TenantManagerShould
         var firstCache = new TestCache();
         var secondCache = new TestCache();
         await secondCache.SetAsync(tenant);
-        var manager = new TenantManager<TenantInfo>(new TestStore(), [firstCache, secondCache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(), [firstCache, secondCache]);
 
         var result = await manager.GetAsync("initech-id");
 
@@ -75,7 +75,7 @@ public class TenantManagerShould
         var store = new TestStore(tenant);
         var firstCache = new TestCache();
         var secondCache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(store, [firstCache, secondCache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [firstCache, secondCache]);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -90,7 +90,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetAsync("initech-id");
 
@@ -103,7 +103,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
-        var manager = new TenantManager<TenantInfo>(store, []);
+        var manager = new TenantManager<TenantInfo, string>(store, []);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -117,7 +117,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetAllAsync();
 
@@ -131,7 +131,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(), [cache]);
 
         var result = await manager.AddAsync(tenant);
 
@@ -147,7 +147,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.AddAsync(tenant);
 
@@ -162,7 +162,7 @@ public class TenantManagerShould
         var oldTenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var newTenant = new TenantInfo { Id = "initech-id", Identifier = "initech-new" };
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(oldTenant), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(oldTenant), [cache]);
 
         var result = await manager.UpdateAsync(newTenant);
 
@@ -178,7 +178,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(), [cache]);
 
         var result = await manager.UpdateAsync(tenant);
 
@@ -192,7 +192,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(tenant), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(tenant), [cache]);
 
         var result = await manager.RemoveAsync("initech-id");
 
@@ -206,7 +206,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(tenant), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(tenant), [cache]);
 
         var result = await manager.RemoveByIdentifierAsync("initech");
 
@@ -221,7 +221,7 @@ public class TenantManagerShould
         var cache = new TestCache();
         var store = new TestStore();
         store.RemoveResult = true;
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.RemoveByIdentifierAsync("initech");
 
@@ -234,7 +234,7 @@ public class TenantManagerShould
     {
         var cache = new TestCache();
         var store = new TestStore { RemoveResult = true };
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.RemoveAsync("initech-id");
 
@@ -247,7 +247,7 @@ public class TenantManagerShould
     public async Task NotInvalidateCachesAfterFailedRemove()
     {
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(new TestStore(), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(), [cache]);
 
         var result = await manager.RemoveByIdentifierAsync("initech");
 
@@ -262,7 +262,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache { ThrowOnGetByIdentifier = true };
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -274,7 +274,7 @@ public class TenantManagerShould
     public async Task ReturnFalseWhenPrimaryStoreAddThrows()
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
-        var manager = new TenantManager<TenantInfo>(new TestStore { ThrowOnAdd = true }, []);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore { ThrowOnAdd = true }, []);
 
         var result = await manager.AddAsync(tenant);
 
@@ -287,7 +287,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache { ThrowOnSet = true };
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
 
         var result = await manager.GetByIdentifierAsync("initech");
 
@@ -299,7 +299,7 @@ public class TenantManagerShould
     {
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var cache = new TestCache { ThrowOnRemove = true };
-        var manager = new TenantManager<TenantInfo>(new TestStore(tenant), [cache]);
+        var manager = new TenantManager<TenantInfo, string>(new TestStore(tenant), [cache]);
 
         var result = await manager.RemoveAsync("initech-id");
 
@@ -312,7 +312,7 @@ public class TenantManagerShould
         var tenant = new TenantInfo { Id = "initech-id", Identifier = "initech" };
         var store = new TestStore(tenant);
         var cache = new TestCache();
-        var manager = new TenantManager<TenantInfo>(store, [cache]);
+        var manager = new TenantManager<TenantInfo, string>(store, [cache]);
         using var cts = new CancellationTokenSource();
 
         await manager.GetByIdentifierAsync("initech", cts.Token);
@@ -321,7 +321,7 @@ public class TenantManagerShould
         Assert.Equal(cts.Token, store.LastCancellationToken);
     }
 
-    private class TestStore : IMultiTenantStore<TenantInfo>
+    private class TestStore : IMultiTenantStore<TenantInfo, string>
     {
         private readonly Dictionary<string, TenantInfo> tenantsByIdentifier = new(StringComparer.OrdinalIgnoreCase);
 
@@ -425,7 +425,7 @@ public class TenantManagerShould
         }
     }
 
-    private class TestCache : IMultiTenantStoreCache<TenantInfo>
+    private class TestCache : IMultiTenantStoreCache<TenantInfo, string>
     {
         private readonly Dictionary<string, TenantInfo> tenantsByIdentifier = new(StringComparer.OrdinalIgnoreCase);
         private readonly Dictionary<string, TenantInfo> tenantsById = new(StringComparer.OrdinalIgnoreCase);
