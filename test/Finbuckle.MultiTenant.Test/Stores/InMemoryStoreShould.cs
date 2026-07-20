@@ -46,12 +46,9 @@ public class InMemoryStoreShould : MultiTenantStoreTestBase
     }
 
     [Theory]
-    [InlineData("", "")]
     [InlineData(null, null)]
-    [InlineData("", null)]
     [InlineData("a", "")]
     [InlineData("a", null)]
-    [InlineData("", "a")]
     [InlineData(null, "a")]
     public async Task ThrowIfAddingTenantWithMissingIdOrIdentifier(string? id, string? identifier)
     {

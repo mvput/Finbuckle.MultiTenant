@@ -125,6 +125,9 @@ public class InMemoryStore<TTenantInfo, TId> : IMultiTenantStore<TTenantInfo, TI
     {
         ArgumentNullException.ThrowIfNull(tenantInfo);
 
+        if (Equals(tenantInfo.Id, null))
+            throw new MultiTenantException("Missing tenant id");
+
         if (string.IsNullOrWhiteSpace(tenantInfo.Identifier))
             throw new MultiTenantException("Missing tenant identifier.");
     }
